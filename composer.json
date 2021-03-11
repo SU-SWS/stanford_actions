@@ -1,8 +1,8 @@
 {
-  "name": "su-sws/stanford_module_example",
-  "description": "Stanford Module Example",
+  "name": "su-sws/stanford_actions",
+  "description": "Drupal module that provides action plugins to work with VBO module",
   "type": "drupal-custom-module",
-  "homepage": "https://github.com/SU-SWS/stanford_module_example",
+  "homepage": "https://github.com/SU-SWS/stanford_actions",
   "authors": [],
   "license": "GPL-2.0-or-later",
   "minimum-stability": "dev",
