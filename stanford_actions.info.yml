@@ -1,0 +1,8 @@
+name: 'Stanford Actions'
+type: module
+description: 'Provides action plugins to work with VBO module.'
+core_version_requirement: ^8.8 || ^9
+version: 8.1.0
+package: 'Stanford'
+dependencies:
+  - 'drupal:views_bulk_operations'

@@ -8,9 +8,10 @@ Changelog: [Changelog.txt](CHANGELOG.txt)
 Description
 ---
 
-The Stanford Module Example module is used to do some things. Please put a
-description of what this module does so that a new developer can get a quick
-understanding about what this module does.
+The Stanford Actions Drupal module provides action plugins to work with VBO module. It currently only contains a node clone action.
+
+It is based off the [`hs_actions`](https://github.com/SU-HSDO/suhumsci/tree/develop/docroot/modules/humsci/hs_actions) module.
+
 
 Accessibility
 ---
@@ -33,16 +34,6 @@ Troubleshooting
 ---
 
 If you are experiencing issues with this module try reverting the feature first. If you are still experiencing issues try posting an issue on the GitHub issues page.
-
-Developer
----
-
-If you wish to develop on this module you will most likely need to compile some new css. Please use the sass structure provided and compile with the sass compiler packaged in this module. To install:
-
-```
-npm install
-npm run build
-```
 
 Contribution / Collaboration
 ---
