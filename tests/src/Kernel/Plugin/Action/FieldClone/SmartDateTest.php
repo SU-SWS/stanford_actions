@@ -2,17 +2,73 @@
 
 namespace Drupal\Tests\stanford_actions\Kernel\Plugin\Action\FieldClone;
 
+use Drupal\Core\Entity\Entity\EntityViewDisplay;
 use Drupal\Core\Form\FormState;
-use Drupal\stanford_actions\Plugin\Action\FieldClone\Date;
+use Drupal\field\Entity\FieldConfig;
+use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
+use Drupal\stanford_actions\Plugin\Action\FieldClone\SmartDate;
 
 /**
  * Test the date field clone plugin functions correctly.
  *
  * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\Date
+ * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\SmartDate
  */
-class DateTest extends FieldCloneTestBase {
+class SmartDateTest extends FieldCloneTestBase {
+
+  /**
+   * Modules to enable.
+   *
+   * @var array
+   */
+  public static $modules = [
+    'system',
+    'node',
+    'user',
+    'stanford_actions',
+    'field',
+    'datetime',
+    'smart_date',
+  ];
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function setUp() {
+    parent::setUp();
+    $this->installConfig('smart_date');
+
+    $field_storage = FieldStorageConfig::create([
+      'field_name' => 'smart_date_field',
+      'entity_type' => 'node',
+      'type' => 'smartdate',
+    ]);
+    $field_storage->save();
+
+    $this->field = FieldConfig::create([
+      'field_storage' => $field_storage,
+      'bundle' => 'page',
+    ]);
+    $this->assertNotFalse($this->field->save());
+
+    $node_display = EntityViewDisplay::load('node.page.default');
+
+    $node_display->setComponent($this->field->getName());
+    $node_display->save();
+
+    $this->node = Node::create([
+      'title' => $this->randomMachineName(),
+      'type' => 'page',
+      $this->field->getName() => [
+        [
+          'value' => $this->currentDate->format('U'),
+          'end_value' => $this->currentDate->format('U'),
+          'duration' => 0,
+        ],
+      ],
+    ]);
+  }
 
   /**
    * Test the plugin form methods.
@@ -23,8 +79,8 @@ class DateTest extends FieldCloneTestBase {
     /** @var \Drupal\stanford_actions\Plugin\FieldCloneManagerInterface $field_manager */
     $field_manager = $this->container->get('plugin.manager.stanford_actions_field_clone');
     /** @var \Drupal\stanford_actions\Plugin\Action\FieldClone\Date $plugin */
-    $plugin = $field_manager->createInstance('date');
-    $this->assertInstanceOf(Date::class, $plugin);
+    $plugin = $field_manager->createInstance('smart_date');
+    $this->assertInstanceOf(SmartDate::class, $plugin);
     $form = [];
     $form_state = new FormState();
     $form = $plugin->buildConfigurationForm($form, $form_state);
@@ -43,7 +99,7 @@ class DateTest extends FieldCloneTestBase {
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
       'field_clone' => [
-        'date' => [
+        'smart_date' => [
           $this->field->getName() => [
             'increment' => 3,
             'unit' => 'years',
@@ -53,14 +109,15 @@ class DateTest extends FieldCloneTestBase {
     ]);
     $action->execute($this->node);
     $nodes = Node::loadMultiple();
+
     /** @var \Drupal\node\NodeInterface $new_node */
     $new_node = end($nodes);
-    $cloned_field_value = $new_node->get($this->field->getName())->getString();
+    $cloned_field_value = $new_node->get($this->field->getName())->getValue();
 
     $interval = \DateInterval::createFromDateString('3 year');
     $this->currentDate->add($interval);
 
-    $this->assertEquals($this->currentDate->format('Y-m-d'), $cloned_field_value);
+    $this->assertEquals($this->currentDate->format('U'), $cloned_field_value[0]['value']);
 
     $test_field_base = new TestFieldCloneBase([], NULL, NULL);
     $form = [];
@@ -73,7 +130,13 @@ class DateTest extends FieldCloneTestBase {
    * Test when the date is copied over a daylight savings, it displays correct.
    */
   public function testDaylightSavingsFromJune() {
-    $this->node->set($this->field->getName(), '2019-06-01T16:15:00');
+    $this->node->set($this->field->getName(), [
+      [
+        'value' => strtotime('2019-06-06 11:00 AM'),
+        'end_value' => strtotime('2019-06-06 11:00 AM'),
+        'timezone' => 'America/Los_Angeles',
+      ],
+    ]);
     $this->node->save();
 
     /** @var \Drupal\Core\Action\ActionManager $action_manager */
@@ -82,7 +145,7 @@ class DateTest extends FieldCloneTestBase {
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
       'field_clone' => [
-        'date' => [
+        'smart_date' => [
           $this->field->getName() => [
             'increment' => 6,
             'unit' => 'months',
@@ -91,6 +154,7 @@ class DateTest extends FieldCloneTestBase {
       ],
     ]);
     $action->execute($this->node);
+
     $nodes = Node::loadMultiple();
     /** @var \Drupal\node\NodeInterface $new_node */
     $new_node = end($nodes);
@@ -98,19 +162,25 @@ class DateTest extends FieldCloneTestBase {
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
     $pre_render = $view_builder->view($this->node);
     $rendered_output = \Drupal::service('renderer')->renderPlain($pre_render);
-    $this->assertStringContainsString('June 2, 2019 2:15 AM', (string) $rendered_output);
+    $this->assertStringContainsString('Wed, Jun 5 2019, 6pm', (string) $rendered_output);
 
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
     $pre_render = $view_builder->view($new_node);
     $rendered_output = \Drupal::service('renderer')->renderPlain($pre_render);
-    $this->assertStringContainsString('December 2, 2019 2:15 AM', (string) $rendered_output);
+    $this->assertStringContainsString('Thu, Dec 5 2019, 6pm', (string) $rendered_output);
   }
 
   /**
    * Test when the date is copied over a daylight savings, it displays correct.
    */
   public function testDaylightSavingsFromDecember() {
-    $this->node->set($this->field->getName(), '2019-12-01T16:15:00');
+    $this->node->set($this->field->getName(), [
+      [
+        'value' => strtotime('2019-12-12 5:00 PM'),
+        'end_value' => strtotime('2019-12-12 5:00 PM'),
+        'timezone' => 'America/Los_Angeles',
+      ],
+    ]);
     $this->node->save();
 
     /** @var \Drupal\Core\Action\ActionManager $action_manager */
@@ -119,7 +189,7 @@ class DateTest extends FieldCloneTestBase {
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
       'field_clone' => [
-        'date' => [
+        'smart_date' => [
           $this->field->getName() => [
             'increment' => 6,
             'unit' => 'months',
@@ -135,12 +205,12 @@ class DateTest extends FieldCloneTestBase {
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
     $pre_render = $view_builder->view($this->node);
     $rendered_output = \Drupal::service('renderer')->renderPlain($pre_render);
-    $this->assertStringContainsString('December 2, 2019 3:15 AM', (string) $rendered_output);
+    $this->assertStringContainsString('Wed, Dec 11 2019, 10pm', (string) $rendered_output);
 
     $view_builder = \Drupal::entityTypeManager()->getViewBuilder('node');
     $pre_render = $view_builder->view($new_node);
     $rendered_output = \Drupal::service('renderer')->renderPlain($pre_render);
-    $this->assertStringContainsString('June 2, 2020 3:15 AM', (string) $rendered_output);
+    $this->assertStringContainsString('Thu, Jun 11 2020, 10pm', (string) $rendered_output);
   }
 
 }

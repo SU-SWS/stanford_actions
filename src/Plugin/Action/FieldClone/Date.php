@@ -3,6 +3,7 @@
 namespace Drupal\stanford_actions\Plugin\Action\FieldClone;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -21,6 +22,11 @@ use Drupal\Core\Form\FormStateInterface;
  */
 class Date extends FieldCloneBase {
 
+  /**
+   * Keyed array to count how many times to clone the entity id (key)
+   *
+   * @var array
+   */
   protected $entityIds = [];
 
   /**
@@ -58,8 +64,8 @@ class Date extends FieldCloneBase {
   /**
    * {@inheritdoc}
    */
-  public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name, array $config = []) {
-    if (!$new_entity->hasField($field_name) || empty($config['increment'])) {
+  public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name) {
+    if (!$new_entity->hasField($field_name) || empty($this->configuration['increment'])) {
       return;
     }
 
@@ -72,25 +78,32 @@ class Date extends FieldCloneBase {
 
     // Use the multiple to multiply how much to increment from the original
     // entity.
-    $config['multiple'] = $this->entityIds[$original_entity->id()];
-
-    $values = $original_entity->get($field_name);
-    $new_values = [];
+    $this->configuration['multiple'] = $this->entityIds[$original_entity->id()];
 
     // Loop through all field values and increment them, then set the new values
     // back to the cloned entity.
-    for ($delta = 0; $delta < $values->count(); $delta++) {
-      $item_value = $values->get($delta)->getValue();
+    $this->incrementFieldValues($new_entity->get($field_name));
+  }
 
-      foreach ($item_value as $column_name => $column_value) {
-        if (!in_array($column_name, ['value', 'end_value'])) {
-          $new_values[$delta][$column_name] = $column_value;
-          continue;
-        }
-        $new_values[$delta][$column_name] = $this->incrementDateValue($column_value, $config);
+  /**
+   * @param \Drupal\Core\Field\FieldItemListInterface $field_values
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface
+   * @throws \Exception
+   */
+  protected function incrementFieldValues(FieldItemListInterface $field_values) {
+    foreach ($field_values as $value) {
+      $properties = array_keys($value->getProperties());
+      $properties = array_filter($properties, function ($key) {
+        return in_array($key, ['value', 'end_value']);
+      });
+
+      foreach ($properties as $property) {
+        $string_value = $value->get($property)->getString();
+        $value->set($property, $this->incrementDateValue($string_value));
       }
     }
-    $new_entity->set($field_name, $new_values);
+    return $field_values;
   }
 
   /**
@@ -98,22 +111,20 @@ class Date extends FieldCloneBase {
    *
    * @param string $value
    *   Original date value.
-   * @param array $increment_config
-   *   Keyed array of increment settings.
    *
    * @return string
    *   The new increased value.
    *
    * @throws \Exception
    */
-  protected function incrementDateValue($value, array $increment_config = []) {
-    $increment = $increment_config['multiple'] * $increment_config['increment'];
+  protected function incrementDateValue($value) {
+    $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
     $new_value = new \DateTime($value);
     $daylight_savings = date('I', $new_value->getTimestamp());
 
     // Add the interval that is in the form of "2 days" or "6 hours".
-    $interval = \DateInterval::createFromDateString($increment . ' ' . $increment_config['unit']);
+    $interval = \DateInterval::createFromDateString($increment . ' ' . $this->configuration['unit']);
     $new_value->add($interval);
 
     // Date fields that don't collect the time use a different date format. We

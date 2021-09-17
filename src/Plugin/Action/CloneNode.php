@@ -119,10 +119,8 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       $this->buildFieldCloneForm($form, $form_state, $node);
     }
 
-    // If no plugins add to the form, remove the fieldset.
-    if (empty(Element::children($form['field_clone']))) {
-      unset($form['field_clone']);
-    }
+    // If no plugins add to the form, don't show the details element.
+    $form['field_clone']['#access'] = !empty(Element::children($form['field_clone']));
 
     return $form;
   }
@@ -230,11 +228,10 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       }
     }
 
-    $field_plugins = $this->getFieldClonePlugins();
-
     foreach ($this->configuration['field_clone'] as $plugin_id => $fields) {
       foreach ($fields as $field_name => $field_changes) {
-        $field_plugins[$plugin_id]->alterFieldValue($entity, $duplicate_entity, $field_name, $field_changes);
+        $plugin = $this->getFieldClonePlugin($plugin_id, $field_changes);
+        $plugin->alterFieldValue($entity, $duplicate_entity, $field_name, $field_changes);
       }
     }
 
@@ -246,16 +243,31 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    *
    * @return \Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface[]
    *   Keyed array of plugins.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function getFieldClonePlugins() {
     if (empty($this->fieldClonePlugins)) {
       foreach ($this->fieldCloneManager->getDefinitions() as $plugin_definition) {
-        $this->fieldClonePlugins[$plugin_definition['id']] = $this->fieldCloneManager->createInstance($plugin_definition['id']);
+        $this->fieldClonePlugins[$plugin_definition['id']] = $this->getFieldClonePlugin($plugin_definition['id']);
       }
     }
     return $this->fieldClonePlugins;
+  }
+
+  /**
+   * Create the single plugin object.
+   *
+   * @param string $plugin_id
+   *   Plugin ID.
+   * @param array $config
+   *   Plugin configuration.
+   *
+   * @return \Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface
+   *   Plugin object.
+   *
+   * @throws \Drupal\Component\Plugin\Exception\PluginException
+   */
+  protected function getFieldClonePlugin($plugin_id, array $config = []) {
+    return $this->fieldCloneManager->createInstance($plugin_id, $config);
   }
 
   /**

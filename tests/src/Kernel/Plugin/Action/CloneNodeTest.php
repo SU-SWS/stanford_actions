@@ -77,15 +77,6 @@ class CloneNodeTest extends KernelTestBase {
 
   /**
    * Test the action methods.
-   *
-   * @covers ::defaultConfiguration
-   * @covers ::buildFieldCloneForm
-   * @covers ::validateConfigurationForm
-   * @covers ::duplicateEntity
-   * @covers ::getReferenceFields
-   * @covers ::buildConfigurationForm
-   * @covers ::submitConfigurationForm
-   * @covers ::execute
    */
   public function testAction() {
     $this->assertEquals(1, $this->getNodeCount());
