@@ -1,7 +1,10 @@
-# [Stanford Module Example](https://github.com/SU-SWS/stanford_module_example)
+# [Stanford Actions](https://github.com/SU-SWS/stanford_actions)
 ##### Version: 8.x-2.x
+[![CircleCI](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x.svg?style=svg)](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x)
+[![Maintainability](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/maintainability)](https://codeclimate.com/github/SU-SWS/stanford_actions/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/test_coverage)](https://codeclimate.com/github/SU-SWS/stanford_actions/test_coverage)
 
-Maintainers: [joegl](https://github.com/joegl),  [imonroe](https://github.com/imonroe),  [Mike Decker](https://github.com/pookmish), [sherakama](https://github.com/sherakama)  
+Maintainers: [joegl](https://github.com/joegl),  [imonroe](https://github.com/imonroe),  [Mike Decker](https://github.com/pookmish), [sherakama](https://github.com/sherakama)
 
 Changelog: [Changelog.txt](CHANGELOG.txt)
 
@@ -16,7 +19,7 @@ It is based off the [`hs_actions`](https://github.com/SU-HSDO/suhumsci/tree/deve
 Accessibility
 ---
 [![WCAG Conformance 2.0 AA Badge](https://www.w3.org/WAI/wcag2AA-blue.png)](https://www.w3.org/TR/WCAG20/)
-Evaluation Date: 201X-XX-XX  
+Evaluation Date: 201X-XX-XX
 This module conforms to level AA WCAG 2.0 standards as required by the university's accessibility policy. For more information on the policy please visit: [https://ucomm.stanford.edu/policies/accessibility-policy.html](https://ucomm.stanford.edu/policies/accessibility-policy.html).
 
 Installation
