@@ -20,7 +20,7 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class Date extends FieldCloneBase {
+class DateClone extends FieldCloneBase {
 
   /**
    * Keyed array to count how many times to clone the entity id (key)
@@ -97,23 +97,24 @@ class Date extends FieldCloneBase {
    * @throws \Exception
    */
   protected function incrementFieldValues(FieldItemListInterface $field_values): FieldItemListInterface {
-//    $field_values->set
-    foreach ($field_values as $delta => $value) {
-      $properties = array_keys($value->getProperties());
+    /** @var \Drupal\Core\Field\FieldItemInterface $field_value */
+    foreach ($field_values as $field_value) {
+      $new_value = $field_value->getValue();
+
+      $properties = array_keys($field_value->getProperties());
       $value_properties = array_filter($properties, function ($key) {
         return in_array($key, ['value', 'end_value']);
       });
 
       foreach ($value_properties as $property) {
-        $string_value = $value->get($property)->getString();
+        $string_value = $field_value->get($property)->getString();
         $timezone = 'UTC';
         if (in_array('timezone', $properties)) {
-          $timezone = $value->get('timezone')->getString();
+          $timezone = $field_value->get('timezone')->getString();
         }
-        $new_value = $this->incrementDateValue($string_value, $timezone);
-        $value->set($property, $this->incrementDateValue($string_value, $timezone));
+        $new_value[$property] = $this->incrementDateValue($string_value, $timezone);
       }
-      $a = 1;
+      $field_value->setValue($new_value);
     }
     return $field_values;
   }

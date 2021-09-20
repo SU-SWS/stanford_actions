@@ -81,7 +81,7 @@ class SmartDateTest extends FieldCloneTestBase {
   public function testForm() {
     /** @var \Drupal\stanford_actions\Plugin\FieldCloneManagerInterface $field_manager */
     $field_manager = $this->container->get('plugin.manager.stanford_actions_field_clone');
-    /** @var \Drupal\stanford_actions\Plugin\Action\FieldClone\Date $plugin */
+    /** @var \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone $plugin */
     $plugin = $field_manager->createInstance('smart_date');
     $this->assertInstanceOf(SmartDate::class, $plugin);
     $form = [];

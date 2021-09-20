@@ -206,6 +206,8 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     }
     for ($i = 0; $i < $this->configuration['clone_count']; $i++) {
       $duplicate_node = $this->duplicateEntity($entity);
+      $duplicate_node->set('created', time());
+      $duplicate_node->set('changed', time());
       $duplicate_node->save();
     }
   }

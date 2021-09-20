@@ -18,7 +18,7 @@ use Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneBase;
  * Test the date field clone plugin functions correctly.
  *
  * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\Date
+ * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone
  */
 abstract class FieldCloneTestBase extends KernelTestBase {
 

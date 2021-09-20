@@ -3,14 +3,14 @@
 namespace Drupal\Tests\stanford_actions\Kernel\Plugin\Action\FieldClone;
 
 use Drupal\Core\Form\FormState;
-use Drupal\stanford_actions\Plugin\Action\FieldClone\Date;
+use Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone;
 use Drupal\node\Entity\Node;
 
 /**
  * Test the date field clone plugin functions correctly.
  *
  * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\Date
+ * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone
  */
 class DateTest extends FieldCloneTestBase {
 
@@ -22,9 +22,9 @@ class DateTest extends FieldCloneTestBase {
   public function testForm() {
     /** @var \Drupal\stanford_actions\Plugin\FieldCloneManagerInterface $field_manager */
     $field_manager = $this->container->get('plugin.manager.stanford_actions_field_clone');
-    /** @var \Drupal\stanford_actions\Plugin\Action\FieldClone\Date $plugin */
+    /** @var \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone $plugin */
     $plugin = $field_manager->createInstance('date');
-    $this->assertInstanceOf(Date::class, $plugin);
+    $this->assertInstanceOf(DateClone::class, $plugin);
     $form = [];
     $form_state = new FormState();
     $form = $plugin->buildConfigurationForm($form, $form_state);
