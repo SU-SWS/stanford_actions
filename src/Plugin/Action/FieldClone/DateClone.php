@@ -97,7 +97,8 @@ class Date extends FieldCloneBase {
    * @throws \Exception
    */
   protected function incrementFieldValues(FieldItemListInterface $field_values): FieldItemListInterface {
-    foreach ($field_values as $value) {
+//    $field_values->set
+    foreach ($field_values as $delta => $value) {
       $properties = array_keys($value->getProperties());
       $value_properties = array_filter($properties, function ($key) {
         return in_array($key, ['value', 'end_value']);
@@ -109,8 +110,10 @@ class Date extends FieldCloneBase {
         if (in_array('timezone', $properties)) {
           $timezone = $value->get('timezone')->getString();
         }
+        $new_value = $this->incrementDateValue($string_value, $timezone);
         $value->set($property, $this->incrementDateValue($string_value, $timezone));
       }
+      $a = 1;
     }
     return $field_values;
   }
