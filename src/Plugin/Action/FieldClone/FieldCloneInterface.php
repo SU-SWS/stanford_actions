@@ -23,8 +23,6 @@ interface FieldCloneInterface extends PluginFormInterface, ContainerFactoryPlugi
    *   New cloned entity, before saving.
    * @param string $field_name
    *   Field name to be altered.
-   * @param array $config
-   *   Array of form submitted config values.
    */
   public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name);
 

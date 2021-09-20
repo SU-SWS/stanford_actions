@@ -2,7 +2,6 @@
 
 namespace Drupal\stanford_actions\Plugin\Action\FieldClone;
 
-use Drupal\Component\Utility\NestedArray;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Plugin\PluginBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;

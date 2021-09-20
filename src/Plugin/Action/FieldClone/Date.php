@@ -86,9 +86,14 @@ class Date extends FieldCloneBase {
   }
 
   /**
+   * Loop through the field values and increase them the configured amount.
+   *
    * @param \Drupal\Core\Field\FieldItemListInterface $field_values
+   *   The field values object from the entity.
    *
    * @return \Drupal\Core\Field\FieldItemListInterface
+   *   Modified field values object.
+   *
    * @throws \Exception
    */
   protected function incrementFieldValues(FieldItemListInterface $field_values) {

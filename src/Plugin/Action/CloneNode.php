@@ -2,7 +2,6 @@
 
 namespace Drupal\stanford_actions\Plugin\Action;
 
-use Drupal\Core\Action\ConfigurableActionBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;

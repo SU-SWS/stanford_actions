@@ -34,20 +34,10 @@ class SmartDate extends Date {
     $new_value = \DateTime::createFromFormat('U', $value);
     $timezone = new \DateTimeZone('America/Los_Angeles');
     $new_value->setTimezone($timezone);
-    $daylight_savings = date('I', $new_value->getTimestamp());
 
     // Add the interval that is in the form of "2 days" or "6 hours".
     $interval = \DateInterval::createFromDateString($increment . ' ' . $this->configuration['unit']);
     $new_value->add($interval);
-
-//    // Adjust the time of the string if the new value skips over the daylight
-//    // savings time.
-//    if (date('I', $new_value->getTimestamp()) != $daylight_savings) {
-//      // Accommodate both going into and out of daylight savings time.
-//      $interval = $daylight_savings ? '1 hour' : '-1 hour';
-//      $interval = \DateInterval::createFromDateString($interval);
-//      $new_value->add($interval);
-//    }
 
     return $new_value->format('U');
   }
