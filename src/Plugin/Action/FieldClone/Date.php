@@ -32,7 +32,7 @@ class Date extends FieldCloneBase {
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $increment = range(0, 12);
@@ -96,16 +96,20 @@ class Date extends FieldCloneBase {
    *
    * @throws \Exception
    */
-  protected function incrementFieldValues(FieldItemListInterface $field_values) {
+  protected function incrementFieldValues(FieldItemListInterface $field_values): FieldItemListInterface {
     foreach ($field_values as $value) {
       $properties = array_keys($value->getProperties());
-      $properties = array_filter($properties, function ($key) {
+      $value_properties = array_filter($properties, function ($key) {
         return in_array($key, ['value', 'end_value']);
       });
 
-      foreach ($properties as $property) {
+      foreach ($value_properties as $property) {
         $string_value = $value->get($property)->getString();
-        $value->set($property, $this->incrementDateValue($string_value));
+        $timezone = 'UTC';
+        if (in_array('timezone', $properties)) {
+          $timezone = $value->get('timezone')->getString();
+        }
+        $value->set($property, $this->incrementDateValue($string_value, $timezone));
       }
     }
     return $field_values;
@@ -122,7 +126,7 @@ class Date extends FieldCloneBase {
    *
    * @throws \Exception
    */
-  protected function incrementDateValue($value) {
+  protected function incrementDateValue($value): string {
     $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
     $new_value = new \DateTime($value);

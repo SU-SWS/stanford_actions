@@ -21,18 +21,20 @@ class SmartDate extends Date {
    *
    * @param string $value
    *   Original date value.
+   * @param string $timezone
+   *   PHP Timezone string.
    *
    * @return string
    *   The new increased value.
    *
    * @throws \Exception
    */
-  protected function incrementDateValue($value) {
+  protected function incrementDateValue($value, $timezone = 'America/Los_Angeles'): string {
 
     $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
     $new_value = \DateTime::createFromFormat('U', $value);
-    $timezone = new \DateTimeZone('America/Los_Angeles');
+    $timezone = new \DateTimeZone($timezone);
     $new_value->setTimezone($timezone);
 
     // Add the interval that is in the form of "2 days" or "6 hours".

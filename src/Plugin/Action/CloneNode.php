@@ -13,6 +13,7 @@ use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\field\FieldConfigInterface;
+use Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface;
 use Drupal\stanford_actions\Plugin\FieldCloneManagerInterface;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -75,7 +76,8 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager, ConfigFactoryInterface $config_factory) {
-    $configuration['clone_entities'] = $config_factory->get('stanford_actions.settings')->get('actions.node_clone_action.clone_entities') ?? [];
+    $configuration['clone_entities'] = $config_factory->get('stanford_actions.settings')
+        ->get('actions.node_clone_action.clone_entities') ?? [];
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;
@@ -86,7 +88,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
   /**
    * {@inheritdoc}
    */
-  public function defaultConfiguration() {
+  public function defaultConfiguration(): array {
     return [
       'clone_entities' => [],
       'clone_count' => 1,
@@ -97,7 +99,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $values = range(1, 10);
     $form['clone_count'] = [
       '#type' => 'select',
@@ -220,7 +222,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function duplicateEntity(ContentEntityInterface $entity) {
+  protected function duplicateEntity(ContentEntityInterface $entity): ContentEntityInterface {
     $duplicate_entity = $entity->createDuplicate();
 
     // Loop through paragraph and eck fields to clone those entities.
@@ -246,7 +248,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @return \Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface[]
    *   Keyed array of plugins.
    */
-  protected function getFieldClonePlugins() {
+  protected function getFieldClonePlugins(): array {
     if (empty($this->fieldClonePlugins)) {
       foreach ($this->fieldCloneManager->getDefinitions() as $plugin_definition) {
         $this->fieldClonePlugins[$plugin_definition['id']] = $this->getFieldClonePlugin($plugin_definition['id']);
@@ -268,7 +270,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    *
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
-  protected function getFieldClonePlugin($plugin_id, array $config = []) {
+  protected function getFieldClonePlugin($plugin_id, array $config = []): FieldCloneInterface {
     return $this->fieldCloneManager->createInstance($plugin_id, $config);
   }
 
@@ -286,7 +288,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
    */
-  protected function getReferenceFields($entity_type_id, $bundle) {
+  protected function getReferenceFields($entity_type_id, $bundle): array {
     $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
     $clone_target_types = $this->configuration['clone_entities'];
 
