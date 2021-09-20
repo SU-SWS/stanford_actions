@@ -33,8 +33,8 @@ class SmartDate extends Date {
 
     $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
-    $new_value = \DateTime::createFromFormat('U', $value);
     $timezone = new \DateTimeZone($timezone);
+    $new_value = \DateTime::createFromFormat('U', $value, $timezone);
     $new_value->setTimezone($timezone);
 
     // Add the interval that is in the form of "2 days" or "6 hours".
