@@ -57,6 +57,8 @@ class SmartDateTest extends FieldCloneTestBase {
     $node_display->setComponent($this->field->getName());
     $node_display->save();
 
+    $timezones = timezone_identifiers_list();
+    $timezone_key = array_rand($timezones);
     $this->node = Node::create([
       'title' => $this->randomMachineName(),
       'type' => 'page',
@@ -64,6 +66,7 @@ class SmartDateTest extends FieldCloneTestBase {
         [
           'value' => $this->currentDate->format('U'),
           'end_value' => $this->currentDate->format('U'),
+          'timezone' => $timezones[$timezone_key],
           'duration' => 0,
         ],
       ],
