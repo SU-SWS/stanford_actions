@@ -2,6 +2,8 @@
 
 namespace Drupal\stanford_actions\Plugin\Action;
 
+use Drupal\Core\Action\ConfigurableActionBase;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\ContentEntityInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -11,7 +13,7 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
-use Drupal\field\Entity\FieldConfig;
+use Drupal\field\FieldConfigInterface;
 use Drupal\stanford_actions\Plugin\FieldCloneManagerInterface;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -65,14 +67,17 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       $plugin_definition,
       $container->get('entity_field.manager'),
       $container->get('entity_type.manager'),
-      $container->get('plugin.manager.stanford_actions_field_clone')
+      $container->get('plugin.manager.stanford_actions_field_clone'),
+      $container->get('config.factory')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager, ConfigFactoryInterface $config_factory) {
+    $configuration['clone_entities'] = $config_factory->get('stanford_actions.settings')->get('actions.node_clone_action.clone_entities') ?? [];
+
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
@@ -84,6 +89,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    */
   public function defaultConfiguration() {
     return [
+      'clone_entities' => [],
       'clone_count' => 1,
       'field_clone' => [],
     ];
@@ -119,7 +125,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       $this->buildFieldCloneForm($form, $form_state, $node);
     }
 
-    // If no plugins add to the form, don't show the details element.
+    // If no plugins add to the form, don't show the detail element.
     $form['field_clone']['#access'] = !empty(Element::children($form['field_clone']));
 
     return $form;
@@ -134,14 +140,11 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    *   Current form state.
    * @param \Drupal\Core\Entity\FieldableEntityInterface $node
    *   Entity to be cloned.
-   *
-   * @throws \Drupal\Component\Plugin\Exception\PluginException
    */
   protected function buildFieldCloneForm(array &$form, FormStateInterface $form_state, FieldableEntityInterface $node) {
     $field_clone_plugins = $this->getFieldClonePlugins();
 
     $fields = $this->entityFieldManager->getFieldDefinitions('node', $node->bundle());
-    /** @var \Drupal\Core\Field\FieldDefinitionInterface $field */
     foreach ($fields as $field) {
       foreach ($field_clone_plugins as $plugin) {
 
@@ -286,14 +289,13 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    */
   protected function getReferenceFields($entity_type_id, $bundle) {
     $fields = $this->entityFieldManager->getFieldDefinitions($entity_type_id, $bundle);
+    $clone_target_types = $this->configuration['clone_entities'];
 
     if ($this->entityTypeManager->hasDefinition('eck_entity_type')) {
       $eck_types = $this->entityTypeManager->getStorage('eck_entity_type')
         ->loadMultiple();
-      $clone_target_types = array_keys($eck_types);
+      $clone_target_types = array_merge($clone_target_types, array_keys($eck_types));
     }
-
-    $clone_target_types[] = 'paragraph';
 
     // Filter out fields that we dont care about. We only need entity reference
     // fields that are not base fields. Also we only want entity reference
@@ -304,7 +306,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
         ->getSetting('target_type');
       $types = ['entity_reference', 'entity_reference_revisions'];
 
-      return $field instanceof FieldConfig && in_array($field->getType(), $types) && in_array($target_entity_id, $clone_target_types);
+      return $field instanceof FieldConfigInterface && in_array($field->getType(), $types) && in_array($target_entity_id, $clone_target_types);
     });
 
     return $reference_fields;

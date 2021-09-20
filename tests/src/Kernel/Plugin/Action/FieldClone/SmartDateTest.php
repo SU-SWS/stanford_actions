@@ -98,6 +98,7 @@ class SmartDateTest extends FieldCloneTestBase {
     /** @var \Drupal\stanford_actions\Plugin\Action\CloneNode $action */
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
+      'clone_entities' => [],
       'field_clone' => [
         'smart_date' => [
           $this->field->getName() => [
@@ -144,6 +145,7 @@ class SmartDateTest extends FieldCloneTestBase {
     /** @var \Drupal\stanford_actions\Plugin\Action\CloneNode $action */
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
+      'clone_entities' => [],
       'field_clone' => [
         'smart_date' => [
           $this->field->getName() => [
@@ -188,6 +190,7 @@ class SmartDateTest extends FieldCloneTestBase {
     /** @var \Drupal\stanford_actions\Plugin\Action\CloneNode $action */
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
+      'clone_entities' => [],
       'field_clone' => [
         'smart_date' => [
           $this->field->getName() => [

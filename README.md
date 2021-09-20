@@ -1,5 +1,6 @@
 # [Stanford Actions](https://github.com/SU-SWS/stanford_actions)
 ##### Version: 8.x-2.x
+
 [![CircleCI](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x.svg?style=svg)](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x)
 [![Maintainability](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/maintainability)](https://codeclimate.com/github/SU-SWS/stanford_actions/maintainability)
 [![Test Coverage](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/test_coverage)](https://codeclimate.com/github/SU-SWS/stanford_actions/test_coverage)
