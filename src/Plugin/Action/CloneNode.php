@@ -76,8 +76,9 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * {@inheritdoc}
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager, ConfigFactoryInterface $config_factory) {
-    $configuration['clone_entities'] = $config_factory->get('stanford_actions.settings')
-        ->get('actions.node_clone_action.clone_entities') ?? [];
+    $clone_entities = $config_factory->get('stanford_actions.settings')
+      ->get('actions.node_clone_action.clone_entities');
+    $configuration['clone_entities'] = $clone_entities ?? [];
 
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->entityFieldManager = $entity_field_manager;
@@ -235,7 +236,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     foreach ($this->configuration['field_clone'] as $plugin_id => $fields) {
       foreach ($fields as $field_name => $field_changes) {
         $plugin = $this->getFieldClonePlugin($plugin_id, $field_changes);
-        $plugin->alterFieldValue($entity, $duplicate_entity, $field_name, $field_changes);
+        $plugin->alterFieldValue($entity, $duplicate_entity, $field_name);
       }
     }
 
