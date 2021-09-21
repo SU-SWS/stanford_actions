@@ -14,39 +14,21 @@ namespace Drupal\stanford_actions\Plugin\Action\FieldClone;
  *   }
  * )
  */
-class SmartDate extends Date {
+class SmartDate extends DateClone {
 
   /**
-   * Increase the given date value by the configured amount.
-   *
-   * @param string $value
-   *   Original date value.
-   * @param array $increment_config
-   *   Keyed array of increment settings.
-   *
-   * @return string
-   *   The new increased value.
-   *
-   * @throws \Exception
+   * {@inheritDoc}
    */
-  protected function incrementDateValue($value, array $increment_config = []) {
-    $increment = $increment_config['multiple'] * $increment_config['increment'];
+  protected function incrementDateValue(string $value, string $timezone = 'America/Los_Angeles'): string {
+    $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
-    $new_value = \DateTime::createFromFormat('U', $value);
-    $daylight_savings = date('I', $new_value->getTimestamp());
+    $timezone = new \DateTimeZone($timezone);
+    $new_value = \DateTime::createFromFormat('U', $value, $timezone);
+    $new_value->setTimezone($timezone);
 
     // Add the interval that is in the form of "2 days" or "6 hours".
-    $interval = \DateInterval::createFromDateString($increment . ' ' . $increment_config['unit']);
+    $interval = \DateInterval::createFromDateString($increment . ' ' . $this->configuration['unit']);
     $new_value->add($interval);
-
-    // Adjust the time of the string if the new value skips over the daylight
-    // savings time.
-    if (date('I', $new_value->getTimestamp()) != $daylight_savings) {
-      // Accommodate both going into and out of daylight savings time.
-      $interval = $daylight_savings ? '1 hour' : '-1 hour';
-      $interval = \DateInterval::createFromDateString($interval);
-      $new_value->add($interval);
-    }
 
     return $new_value->format('U');
   }

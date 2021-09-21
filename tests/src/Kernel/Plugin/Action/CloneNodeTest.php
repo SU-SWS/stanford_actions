@@ -77,15 +77,6 @@ class CloneNodeTest extends KernelTestBase {
 
   /**
    * Test the action methods.
-   *
-   * @covers ::defaultConfiguration
-   * @covers ::buildFieldCloneForm
-   * @covers ::validateConfigurationForm
-   * @covers ::duplicateEntity
-   * @covers ::getReferenceFields
-   * @covers ::buildConfigurationForm
-   * @covers ::submitConfigurationForm
-   * @covers ::execute
    */
   public function testAction() {
     $this->assertEquals(1, $this->getNodeCount());
@@ -97,7 +88,7 @@ class CloneNodeTest extends KernelTestBase {
     $this->assertEquals(CloneNode::class, get_class($action));
 
     // Simple methods.
-    $this->assertCount(2, $action->defaultConfiguration());
+    $this->assertArrayHasKey('clone_entities', $action->defaultConfiguration());
     $this->assertArrayHasKey('clone_count', $action->defaultConfiguration());
     $this->assertArrayHasKey('field_clone', $action->defaultConfiguration());
 

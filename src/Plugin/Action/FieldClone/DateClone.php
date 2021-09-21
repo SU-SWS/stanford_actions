@@ -3,6 +3,7 @@
 namespace Drupal\stanford_actions\Plugin\Action\FieldClone;
 
 use Drupal\Core\Entity\FieldableEntityInterface;
+use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Form\FormStateInterface;
 
 /**
@@ -19,14 +20,19 @@ use Drupal\Core\Form\FormStateInterface;
  *   }
  * )
  */
-class Date extends FieldCloneBase {
+class DateClone extends FieldCloneBase {
 
+  /**
+   * Keyed array to count how many times to clone the entity id (key)
+   *
+   * @var array
+   */
   protected $entityIds = [];
 
   /**
    * {@inheritdoc}
    */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+  public function buildConfigurationForm(array $form, FormStateInterface $form_state): array {
     $form = parent::buildConfigurationForm($form, $form_state);
 
     $increment = range(0, 12);
@@ -58,8 +64,8 @@ class Date extends FieldCloneBase {
   /**
    * {@inheritdoc}
    */
-  public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name, array $config = []) {
-    if (!$new_entity->hasField($field_name) || empty($config['increment'])) {
+  public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name) {
+    if (!$new_entity->hasField($field_name) || empty($this->configuration['increment'])) {
       return;
     }
 
@@ -72,25 +78,45 @@ class Date extends FieldCloneBase {
 
     // Use the multiple to multiply how much to increment from the original
     // entity.
-    $config['multiple'] = $this->entityIds[$original_entity->id()];
-
-    $values = $original_entity->get($field_name);
-    $new_values = [];
+    $this->configuration['multiple'] = $this->entityIds[$original_entity->id()];
 
     // Loop through all field values and increment them, then set the new values
     // back to the cloned entity.
-    for ($delta = 0; $delta < $values->count(); $delta++) {
-      $item_value = $values->get($delta)->getValue();
+    $this->incrementFieldValues($new_entity->get($field_name));
+  }
 
-      foreach ($item_value as $column_name => $column_value) {
-        if (!in_array($column_name, ['value', 'end_value'])) {
-          $new_values[$delta][$column_name] = $column_value;
-          continue;
+  /**
+   * Loop through the field values and increase them the configured amount.
+   *
+   * @param \Drupal\Core\Field\FieldItemListInterface $field_values
+   *   The field values object from the entity.
+   *
+   * @return \Drupal\Core\Field\FieldItemListInterface
+   *   Modified field values object.
+   *
+   * @throws \Exception
+   */
+  protected function incrementFieldValues(FieldItemListInterface $field_values): FieldItemListInterface {
+    /** @var \Drupal\Core\Field\FieldItemInterface $field_value */
+    foreach ($field_values as $field_value) {
+      $new_value = $field_value->getValue();
+
+      $properties = array_keys($field_value->getProperties());
+      $value_properties = array_filter($properties, function ($key) {
+        return in_array($key, ['value', 'end_value']);
+      });
+
+      foreach ($value_properties as $property) {
+        $string_value = $field_value->get($property)->getString();
+        $timezone = 'UTC';
+        if (in_array('timezone', $properties)) {
+          $timezone = $field_value->get('timezone')->getString();
         }
-        $new_values[$delta][$column_name] = $this->incrementDateValue($column_value, $config);
+        $new_value[$property] = $this->incrementDateValue($string_value, $timezone);
       }
+      $field_value->setValue($new_value);
     }
-    $new_entity->set($field_name, $new_values);
+    return $field_values;
   }
 
   /**
@@ -98,22 +124,22 @@ class Date extends FieldCloneBase {
    *
    * @param string $value
    *   Original date value.
-   * @param array $increment_config
-   *   Keyed array of increment settings.
+   * @param string $timezone
+   *   PHP Timezone String.
    *
    * @return string
    *   The new increased value.
    *
    * @throws \Exception
    */
-  protected function incrementDateValue($value, array $increment_config = []) {
-    $increment = $increment_config['multiple'] * $increment_config['increment'];
+  protected function incrementDateValue(string $value, string $timezone = 'UTC'): string {
+    $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
-    $new_value = new \DateTime($value);
+    $new_value = new \DateTime($value, new \DateTimeZone($timezone));
     $daylight_savings = date('I', $new_value->getTimestamp());
 
     // Add the interval that is in the form of "2 days" or "6 hours".
-    $interval = \DateInterval::createFromDateString($increment . ' ' . $increment_config['unit']);
+    $interval = \DateInterval::createFromDateString($increment . ' ' . $this->configuration['unit']);
     $new_value->add($interval);
 
     // Date fields that don't collect the time use a different date format. We
