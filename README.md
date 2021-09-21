@@ -16,13 +16,6 @@ The Stanford Actions Drupal module provides action plugins to work with VBO modu
 
 It is based off the [`hs_actions`](https://github.com/SU-HSDO/suhumsci/tree/develop/docroot/modules/humsci/hs_actions) module.
 
-
-Accessibility
----
-[![WCAG Conformance 2.0 AA Badge](https://www.w3.org/WAI/wcag2AA-blue.png)](https://www.w3.org/TR/WCAG20/)
-Evaluation Date: 201X-XX-XX
-This module conforms to level AA WCAG 2.0 standards as required by the university's accessibility policy. For more information on the policy please visit: [https://ucomm.stanford.edu/policies/accessibility-policy.html](https://ucomm.stanford.edu/policies/accessibility-policy.html).
-
 Installation
 ---
 
