@@ -124,16 +124,18 @@ class DateClone extends FieldCloneBase {
    *
    * @param string $value
    *   Original date value.
+   * @param string $timezone
+   *   PHP Timezone String.
    *
    * @return string
    *   The new increased value.
    *
    * @throws \Exception
    */
-  protected function incrementDateValue($value): string {
+  protected function incrementDateValue(string $value, string $timezone = 'UTC'): string {
     $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
-    $new_value = new \DateTime($value);
+    $new_value = new \DateTime($value, new \DateTimeZone($timezone));
     $daylight_savings = date('I', $new_value->getTimestamp());
 
     // Add the interval that is in the form of "2 days" or "6 hours".

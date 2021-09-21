@@ -17,19 +17,9 @@ namespace Drupal\stanford_actions\Plugin\Action\FieldClone;
 class SmartDate extends DateClone {
 
   /**
-   * Increase the given date value by the configured amount.
-   *
-   * @param string $value
-   *   Original date value.
-   * @param string $timezone
-   *   PHP Timezone string.
-   *
-   * @return string
-   *   The new increased value.
-   *
-   * @throws \Exception
+   * {@inheritDoc}
    */
-  protected function incrementDateValue($value, $timezone = 'America/Los_Angeles'): string {
+  protected function incrementDateValue(string $value, string $timezone = 'America/Los_Angeles'): string {
     $increment = $this->configuration['multiple'] * $this->configuration['increment'];
 
     $timezone = new \DateTimeZone($timezone);
