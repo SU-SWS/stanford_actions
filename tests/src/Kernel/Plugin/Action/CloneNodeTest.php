@@ -96,7 +96,7 @@ class CloneNodeTest extends KernelTestBase {
     $form_state = new FormState();
     $context = ['list' => [$this->node->id()]];
     $action->setContext($context);
-    $this->assertCount(2, $action->buildConfigurationForm($form, $form_state));
+    $this->assertGreaterThanOrEqual(2, $action->buildConfigurationForm($form, $form_state));
     $this->assertArrayHasKey('clone_count', $action->buildConfigurationForm($form, $form_state));
 
     $form_state->setValue('clone_count', 7);
@@ -106,6 +106,16 @@ class CloneNodeTest extends KernelTestBase {
 
     $action->execute($this->node);
     $this->assertEquals(8, $this->getNodeCount());
+
+
+    $form_state->setValue('clone_count', 1);
+    $form_state->setValue('prepend_title', 'foo bar');
+    $action->submitConfigurationForm($form, $form_state);
+    $action->execute($this->node);
+    $cloned = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadByProperties(['title' => 'foo bar ' . $this->node->getTitle()]);
+    $this->assertCount(1, $cloned);
   }
 
   /**
