@@ -12,7 +12,9 @@ use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
 use Drupal\Core\Render\Element;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\field\FieldConfigInterface;
+use Drupal\node\NodeInterface;
 use Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface;
 use Drupal\stanford_actions\Plugin\FieldCloneManagerInterface;
 use Drupal\views_bulk_operations\Action\ViewsBulkOperationsActionBase;
@@ -58,6 +60,13 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
   protected $fieldClonePlugins;
 
   /**
+   * Currently active user.
+   *
+   * @var \Drupal\Core\Session\AccountProxyInterface
+   */
+  protected $currentUser;
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -68,14 +77,15 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       $container->get('entity_field.manager'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.stanford_actions_field_clone'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('current_user')
     );
   }
 
   /**
    * {@inheritdoc}
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityFieldManagerInterface $entity_field_manager, EntityTypeManagerInterface $entity_type_manager, FieldCloneManagerInterface $field_clone_manager, ConfigFactoryInterface $config_factory, AccountProxyInterface $current_user) {
     $clone_entities = $config_factory->get('stanford_actions.settings')
       ->get('actions.node_clone_action.clone_entities');
     $configuration['clone_entities'] = $clone_entities ?? [];
@@ -84,6 +94,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     $this->entityFieldManager = $entity_field_manager;
     $this->entityTypeManager = $entity_type_manager;
     $this->fieldCloneManager = $field_clone_manager;
+    $this->currentUser = $current_user;
   }
 
   /**
@@ -93,6 +104,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     return [
       'clone_entities' => [],
       'clone_count' => 1,
+      'prepend_title' => '',
       'field_clone' => [],
     ];
   }
@@ -106,6 +118,11 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       '#type' => 'select',
       '#title' => $this->t('Clone how many times'),
       '#options' => array_combine($values, $values),
+    ];
+    $form['prepend_title'] = [
+      '#type' => 'textfield',
+      '#title' => $this->t('Prepend Cloned Titles'),
+      '#default_value' => 'Clone',
     ];
 
     foreach ($this->context['list'] as $item) {
@@ -182,6 +199,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     foreach ($this->getFieldClonePlugins() as $plugin) {
       $plugin->submitConfigurationForm($form, $form_state);
     }
+    $this->configuration['prepend_title'] = $form_state->getValue('prepend_title');
     $this->configuration['clone_count'] = $form_state->getValue('clone_count');
     $this->configuration['field_clone'] = $form_state->getValue('field_clone', []);
   }
@@ -205,10 +223,31 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       $this->configuration['clone_count'] = 1;
     }
     for ($i = 0; $i < $this->configuration['clone_count']; $i++) {
+      /** @var \Drupal\node\NodeInterface $duplicate_node */
       $duplicate_node = $this->duplicateEntity($entity);
+      $this->adjustNodeTitle($duplicate_node);
+      $duplicate_node->setUnpublished();
+      $duplicate_node->set('uid', $this->currentUser->id());
       $duplicate_node->set('created', time());
       $duplicate_node->set('changed', time());
       $duplicate_node->save();
+    }
+  }
+
+  /**
+   * Modify the node title if configured to prepend a string.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   New node entity.
+   */
+  protected function adjustNodeTitle(NodeInterface $node) {
+    if ($this->configuration['prepend_title'] ?? FALSE) {
+      $new_title = trim($this->configuration['prepend_title']) . ' ' . $node->label();
+
+      // Make sure the new title will fit in the database.
+      if (strlen($new_title) <= 255) {
+        $node->set('title', $new_title);
+      }
     }
   }
 

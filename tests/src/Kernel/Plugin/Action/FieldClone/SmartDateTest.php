@@ -121,7 +121,7 @@ class SmartDateTest extends FieldCloneTestBase {
     $interval = \DateInterval::createFromDateString('3 year');
     $this->currentDate->add($interval);
 
-    $this->assertEquals($this->currentDate->format('U'), $cloned_field_value[0]['value']);
+    $this->assertEquals($this->currentDate->format('Y-m-d'), date('Y-m-d', $cloned_field_value[0]['value']));
 
     $test_field_base = new TestFieldCloneBase([], NULL, NULL);
     $form = [];
