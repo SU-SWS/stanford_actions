@@ -5,21 +5,13 @@ checks:
   method-complexity:
     config:
       threshold: 10
-  method-lines:
-    config:
-      threshold: 40
-  method-count:
-    config:
-      threshold: 25
 
 plugins:
   # https://docs.codeclimate.com/docs/eslint
   # ES Linting requires an .eslintrc file to tweak checks.
   eslint:
-    enabled: true
-  markdownlint:
     enabled: false
-  # CSS is generated and shouldn't be linted.
+  # We can ignore css since we compile all css from scss files.
   csslint:
     enabled: false
   # We don't lint our coffee. Eew.
@@ -99,6 +91,8 @@ plugins:
         javascript:
           mass_threshold: 50
           # count_threshold: 3
+        php:
+          mass_threshold: 60
   fixme:
     enabled: true
     config:
@@ -111,14 +105,8 @@ plugins:
         - dsm
 # exclude these files/paths
 exclude_patterns:
-- "test"
-- "tests"
-- "**/tests/**/*"
-- "vendor"
-- "vendors"
-- "node_modules"
-- "composer.json"
-- "package.json"
-- "webpack.config.js"
-- "**.min.*"
-- "spec/"
+  - "tests/"
+  - "**.min.*"
+  - "**/Gruntfile.js"
+  - "**.min.*"
+  - "**/tests/**/*"

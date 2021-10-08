@@ -26,6 +26,7 @@ rules:
     -
       convention: hyphenatedlowercase
   hex-length: 0
+  hex-notation: uppercase
   leading-zero:
     - 1
     - include: true
@@ -49,7 +50,7 @@ rules:
     -
       allow-element-with-attribute: 1
   one-declaration-per-line: 1
-  placeholder-in-extend: 1
+  placeholder-in-extend: 0
   property-sort-order: 0
   quotes: 0
   shorthand-values: 0

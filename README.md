@@ -1,22 +1,20 @@
-# [Stanford Module Example](https://github.com/SU-SWS/stanford_module_example)
+# [Stanford Actions](https://github.com/SU-SWS/stanford_actions)
 ##### Version: 8.x-2.x
 
-Maintainers: [Mike Decker](https://github.com/pookmish), [sherakama](https://github.com/sherakama)  
+[![CircleCI](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x.svg?style=svg)](https://circleci.com/gh/SU-SWS/stanford_actions/tree/8.x-2.x)
+[![Maintainability](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/maintainability)](https://codeclimate.com/github/SU-SWS/stanford_actions/maintainability)
+[![Test Coverage](https://api.codeclimate.com/v1/badges/405d5966b200a520cd0e/test_coverage)](https://codeclimate.com/github/SU-SWS/stanford_actions/test_coverage)
+
+Maintainers: [joegl](https://github.com/joegl),  [imonroe](https://github.com/imonroe),  [Mike Decker](https://github.com/pookmish), [sherakama](https://github.com/sherakama)
 
 Changelog: [Changelog.txt](CHANGELOG.txt)
 
 Description
 ---
 
-The Stanford Module Example module is used to do some things. Please put a
-description of what this module does so that a new developer can get a quick
-understanding about what this module does.
+The Stanford Actions Drupal module provides action plugins to work with VBO module. It currently only contains a node clone action.
 
-Accessibility
----
-[![WCAG Conformance 2.0 AA Badge](https://www.w3.org/WAI/wcag2AA-blue.png)](https://www.w3.org/TR/WCAG20/)
-Evaluation Date: 201X-XX-XX  
-This module conforms to level AA WCAG 2.0 standards as required by the university's accessibility policy. For more information on the policy please visit: [https://ucomm.stanford.edu/policies/accessibility-policy.html](https://ucomm.stanford.edu/policies/accessibility-policy.html).
+It is based off the [`hs_actions`](https://github.com/SU-HSDO/suhumsci/tree/develop/docroot/modules/humsci/hs_actions) module.
 
 Installation
 ---
@@ -33,16 +31,6 @@ Troubleshooting
 ---
 
 If you are experiencing issues with this module try reverting the feature first. If you are still experiencing issues try posting an issue on the GitHub issues page.
-
-Developer
----
-
-If you wish to develop on this module you will most likely need to compile some new css. Please use the sass structure provided and compile with the sass compiler packaged in this module. To install:
-
-```
-npm install
-npm run build
-```
 
 Contribution / Collaboration
 ---
