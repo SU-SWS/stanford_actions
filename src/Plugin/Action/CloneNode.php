@@ -222,9 +222,10 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     if (!isset($this->configuration['clone_count'])) {
       $this->configuration['clone_count'] = 1;
     }
+    $duplicate_node = $entity;
     for ($i = 0; $i < $this->configuration['clone_count']; $i++) {
       /** @var \Drupal\node\NodeInterface $duplicate_node */
-      $duplicate_node = $this->duplicateEntity($entity);
+      $duplicate_node = $this->duplicateEntity($duplicate_node);
       $this->adjustNodeTitle($duplicate_node);
       $duplicate_node->setUnpublished();
       $duplicate_node->set('uid', $this->currentUser->id());
