@@ -43,6 +43,7 @@ class DateTest extends FieldCloneTestBase {
     $action = $action_manager->createInstance('node_clone_action');
     $action->setConfiguration([
       'clone_entities' => [],
+      'clone_count' => 5,
       'field_clone' => [
         'date' => [
           $this->field->getName() => [
@@ -58,7 +59,7 @@ class DateTest extends FieldCloneTestBase {
     $new_node = end($nodes);
     $cloned_field_value = $new_node->get($this->field->getName())->getString();
 
-    $interval = \DateInterval::createFromDateString('3 year');
+    $interval = \DateInterval::createFromDateString(3 * 5 . ' year');
     $this->currentDate->add($interval);
 
     $this->assertEquals($this->currentDate->format('Y-m-d'), $cloned_field_value);
