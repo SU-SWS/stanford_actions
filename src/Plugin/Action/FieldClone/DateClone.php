@@ -38,13 +38,6 @@ class DateClone extends FieldCloneBase {
     $increment = range(0, 12);
     unset($increment[0]);
 
-    $form['increment'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Increment Amount'),
-      '#options' => $increment,
-      '#empty_option' => $this->t('- Do Not Change -'),
-    ];
-
     $form['unit'] = [
       '#type' => 'select',
       '#title' => $this->t('Units'),
@@ -58,7 +51,12 @@ class DateClone extends FieldCloneBase {
         'second' => $this->t('Second'),
       ],
     ];
-
+    $form['increment'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Increment Amount'),
+      '#options' => $increment,
+      '#empty_option' => $this->t('- Do Not Change -'),
+    ];
     return $form;
   }
 

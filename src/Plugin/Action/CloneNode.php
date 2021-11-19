@@ -222,10 +222,12 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     if (!isset($this->configuration['clone_count'])) {
       $this->configuration['clone_count'] = 1;
     }
+    $duplicate_node = $entity;
+    $original_title = $entity->label();
     for ($i = 0; $i < $this->configuration['clone_count']; $i++) {
       /** @var \Drupal\node\NodeInterface $duplicate_node */
-      $duplicate_node = $this->duplicateEntity($entity);
-      $this->adjustNodeTitle($duplicate_node);
+      $duplicate_node = $this->duplicateEntity($duplicate_node);
+      $this->adjustNodeTitle($duplicate_node, $original_title);
       $duplicate_node->setUnpublished();
       $duplicate_node->set('uid', $this->currentUser->id());
       $duplicate_node->set('created', time());
@@ -240,9 +242,9 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @param \Drupal\node\NodeInterface $node
    *   New node entity.
    */
-  protected function adjustNodeTitle(NodeInterface $node) {
+  protected function adjustNodeTitle(NodeInterface $node, $original_title) {
     if ($this->configuration['prepend_title'] ?? FALSE) {
-      $new_title = trim($this->configuration['prepend_title']) . ' ' . $node->label();
+      $new_title = trim($this->configuration['prepend_title']) . ' ' . $original_title;
 
       // Make sure the new title will fit in the database.
       if (strlen($new_title) <= 255) {
