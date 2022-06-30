@@ -265,13 +265,16 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @throws \Drupal\Component\Plugin\Exception\InvalidPluginDefinitionException
    * @throws \Drupal\Component\Plugin\Exception\PluginException
    * @throws \Drupal\Component\Plugin\Exception\PluginNotFoundException
+   * @throws \Drupal\Core\TypedData\Exception\MissingDataException
    */
   protected function duplicateEntity(ContentEntityInterface $entity): ContentEntityInterface {
     $duplicate_entity = $entity->createDuplicate();
+    $duplicate_entity->enforceIsNew();
 
     // Loop through paragraph and eck fields to clone those entities.
     foreach ($this->getReferenceFields($entity->getEntityTypeId(), $entity->bundle()) as $field) {
-      foreach ($duplicate_entity->{$field->getName()} as $value) {
+      /** @var \Drupal\Core\Field\FieldItemInterface $value */
+      foreach ($duplicate_entity->get($field->getName()) as $value) {
         $value->entity = $this->duplicateEntity($value->entity);
       }
     }
