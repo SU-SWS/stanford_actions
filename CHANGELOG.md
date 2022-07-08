@@ -1,6 +1,14 @@
 # Stanford Module Example
 
 
+8.2.4
+--------------------------------------------------------------------------------
+_Release Date: 2022-07-08_
+
+- Enforce new duplicate entities
+- fixed composer namespace to lowercase
+
+
 8.x-2.2
 --------------------------------------------------------------------------------
 _Release Date: 2022-03-17_
