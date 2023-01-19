@@ -35,7 +35,7 @@ class SmartDateTest extends FieldCloneTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp() {
+  protected function setUp(): void {
     parent::setUp();
     $this->installConfig('smart_date');
 
