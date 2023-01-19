@@ -59,7 +59,7 @@ class DateTest extends FieldCloneTestBase {
     $new_node = end($nodes);
     $cloned_field_value = $new_node->get($this->field->getName())->getString();
 
-    $interval = \DateInterval::createFromDateString(3 * 5 . ' year');
+    $interval = \DateInterval::createFromDateString(2 * 5 . ' year');
     $this->currentDate->add($interval);
 
     $this->assertEquals($this->currentDate->format('Y-m-d'), $cloned_field_value);
