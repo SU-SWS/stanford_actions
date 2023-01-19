@@ -106,7 +106,7 @@ class SmartDateTest extends FieldCloneTestBase {
       'field_clone' => [
         'smart_date' => [
           $this->field->getName() => [
-            'increment' => 3,
+            'increment' => 2,
             'unit' => 'years',
           ],
         ],

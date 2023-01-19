@@ -47,7 +47,7 @@ class DateTest extends FieldCloneTestBase {
       'field_clone' => [
         'date' => [
           $this->field->getName() => [
-            'increment' => 3,
+            'increment' => 2,
             'unit' => 'years',
           ],
         ],
