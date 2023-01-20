@@ -349,15 +349,13 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     // fields that are not base fields. Also we only want entity reference
     // fields that target specific entity types as defined above that require
     // cloning..
-    $reference_fields = array_filter($fields, function ($field) use ($clone_target_types) {
+    return array_filter($fields, function ($field) use ($clone_target_types) {
       $target_entity_id = $field->getFieldStorageDefinition()
         ->getSetting('target_type');
       $types = ['entity_reference', 'entity_reference_revisions'];
 
       return $field instanceof FieldConfigInterface && in_array($field->getType(), $types) && in_array($target_entity_id, $clone_target_types);
     });
-
-    return $reference_fields;
   }
 
 }
