@@ -67,7 +67,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @param \Drupal\stanford_actions\Plugin\FieldCloneManagerInterface $fieldCloneManager
    *   Field clone plugin manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   Config factory srervice
+   *   Config factory service.
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
    *   Current active user.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher

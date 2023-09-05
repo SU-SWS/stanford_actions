@@ -37,7 +37,7 @@ class StanfordActionsSubscriber implements EventSubscriberInterface {
    * @param \Drupal\stanford_actions\Events\NodeCloneEvent $event
    *   Triggered event.
    */
-  public function onNodeClone(NodeCloneEvent $event):void {
+  public function onNodeClone(NodeCloneEvent $event): void {
     $fields = $this->fieldManager->getFieldDefinitions('node', $event->getNode()
       ->bundle());
 
@@ -58,7 +58,7 @@ class StanfordActionsSubscriber implements EventSubscriberInterface {
    * @param string $field_name
    *   Paragraph field name.
    */
-  protected function fixLayoutParagraphEntities(NodeInterface $new_node,NodeInterface $old_node, string $field_name):void{
+  protected function fixLayoutParagraphEntities(NodeInterface $new_node, NodeInterface $old_node, string $field_name): void {
     $p_storage = $this->entityTypeManager->getStorage('paragraph');
     $original_parent_deltas = [];
 
@@ -70,7 +70,6 @@ class StanfordActionsSubscriber implements EventSubscriberInterface {
       $original_parent_deltas[] = $paragraph?->uuid();
     }
 
-
     foreach ($new_node->get($field_name) as $item) {
       /** @var \Drupal\paragraphs\ParagraphInterface $paragraph */
       $paragraph = $p_storage->load($item->get('target_id')->getString());
@@ -78,7 +77,6 @@ class StanfordActionsSubscriber implements EventSubscriberInterface {
       // The parent uuid behavior was set, so we need to reset it to the new
       // uuid on the duplicated item.
       if (!empty($behaviors['layout_paragraphs']['parent_uuid'])) {
-
         // If the parent uuid changed or doesn't exist in the original node,
         // don't do anything to the paragraph.
         $orig_parent_delta = array_search($behaviors['layout_paragraphs']['parent_uuid'], $original_parent_deltas);
