@@ -41,7 +41,6 @@ class CloneNodeTest extends KernelTestBase {
     'field',
     'datetime',
     'paragraphs',
-    'entity_reference',
     'entity_reference_revisions',
     'file',
   ];
@@ -49,7 +48,7 @@ class CloneNodeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  protected function setUp(): void {
+  public function setup(): void {
     parent::setUp();
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
