@@ -103,6 +103,11 @@ abstract class FieldCloneTestBase extends KernelTestBase {
       $this->field->getName() => ['value' => $this->currentDate->format('Y-m-d')],
     ]);
     $this->node->save();
+
+    DateFormat::create([
+      'id' => 'fallback',
+      'pattern' => 'D, m/d/Y - H:i',
+    ])->save();
   }
 
 }

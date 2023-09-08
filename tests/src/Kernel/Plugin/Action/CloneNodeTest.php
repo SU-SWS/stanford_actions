@@ -41,7 +41,6 @@ class CloneNodeTest extends KernelTestBase {
     'field',
     'datetime',
     'paragraphs',
-    'entity_reference',
     'entity_reference_revisions',
     'file',
   ];
