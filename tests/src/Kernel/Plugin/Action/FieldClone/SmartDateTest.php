@@ -23,7 +23,7 @@ class SmartDateTest extends FieldCloneTestBase {
    *
    * @var array
    */
-  public static $modules = [
+  protected static $modules = [
     'system',
     'node',
     'user',
