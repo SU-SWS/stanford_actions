@@ -35,10 +35,10 @@ jobs:
         uses: actions/upload-artifact@v4
         if: failure()
         with:
-          name: d11-unit-tests-results
+          name: d10-unit-tests-results
           path: /var/www/html/artifacts
   phpunit_d11:
-    name: PHPUnit Coverage Tests
+    name: PHPUnit Coverage Tests Drupal 11
     runs-on: ubuntu-latest
     container:
       image: pookmish/drupal8ci:php8.3
