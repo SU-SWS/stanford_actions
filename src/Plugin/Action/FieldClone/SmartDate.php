@@ -7,15 +7,6 @@ use Drupal\stanford_actions\Attribute\FieldClone;
 
 /**
  * Class Date to increment date fields.
- *
- * @FieldClone(
- *   id = "smart_date",
- *   label = @Translation("Smart Date"),
- *   description = @Translation("Incrementally increase the Smart date on the field for every cloned item."),
- *   fieldTypes = {
- *     "smartdate"
- *   }
- * )
  */
 #[FieldClone(
   id: 'smart_date',
