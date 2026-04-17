@@ -27,7 +27,6 @@ class SmartDateTest extends FieldCloneTestBase {
     'system',
     'node',
     'user',
-    'stanford_actions',
     'field',
     'datetime',
     'smart_date',
@@ -38,6 +37,7 @@ class SmartDateTest extends FieldCloneTestBase {
    */
   public function setup(): void {
     parent::setUp();
+    $this->container->get('module_installer')->install(['stanford_actions']);
     $this->installConfig('smart_date');
 
     $field_storage = FieldStorageConfig::create([

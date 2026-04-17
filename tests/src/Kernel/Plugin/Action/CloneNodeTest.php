@@ -37,7 +37,6 @@ class CloneNodeTest extends KernelTestBase {
     'system',
     'node',
     'user',
-    'stanford_actions',
     'field',
     'datetime',
     'paragraphs',
@@ -50,6 +49,7 @@ class CloneNodeTest extends KernelTestBase {
    */
   public function setup(): void {
     parent::setUp();
+    $this->container->get('module_installer')->install(['stanford_actions']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
     $this->installSchema('system', 'sequences');
