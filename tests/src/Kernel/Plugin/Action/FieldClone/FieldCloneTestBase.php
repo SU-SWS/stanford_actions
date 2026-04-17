@@ -52,7 +52,6 @@ abstract class FieldCloneTestBase extends KernelTestBase {
     'system',
     'node',
     'user',
-    'stanford_actions',
     'field',
     'datetime',
   ];
@@ -62,7 +61,7 @@ abstract class FieldCloneTestBase extends KernelTestBase {
    */
   public function setup(): void {
     parent::setUp();
-    $this->currentDate = new \DateTime();
+    $this->container->get('module_installer')->install(['stanford_actions']);    $this->currentDate = new \DateTime();
 
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
