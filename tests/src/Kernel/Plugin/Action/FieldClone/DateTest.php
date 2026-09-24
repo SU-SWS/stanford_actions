@@ -5,13 +5,14 @@ namespace Drupal\Tests\stanford_actions\Kernel\Plugin\Action\FieldClone;
 use Drupal\Core\Form\FormState;
 use Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the date field clone plugin functions correctly.
- *
- * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone
  */
+#[Group('stanford_actions')]
+#[RunTestsInSeparateProcesses]
 class DateTest extends FieldCloneTestBase {
 
   /**
@@ -69,6 +70,37 @@ class DateTest extends FieldCloneTestBase {
     $form_state = new FormState();
     $this->assertNull($test_field_base->validateConfigurationForm($form, $form_state));
     $this->assertNull($test_field_base->submitConfigurationForm($form, $form_state));
+  }
+
+  /**
+   * Without an increment amount, the cloned date is left unchanged.
+   */
+  public function testNoIncrement() {
+    $original_value = $this->node->get($this->field->getName())->getString();
+
+    /** @var \Drupal\Core\Action\ActionManager $action_manager */
+    $action_manager = $this->container->get('plugin.manager.action');
+    /** @var \Drupal\stanford_actions\Plugin\Action\CloneNode $action */
+    $action = $action_manager->createInstance('node_clone_action');
+    $action->setConfiguration([
+      'clone_entities' => [],
+      'clone_count' => 2,
+      'field_clone' => [
+        'date' => [
+          $this->field->getName() => [
+            'increment' => '',
+            'unit' => 'year',
+          ],
+        ],
+      ],
+    ]);
+    $action->execute($this->node);
+
+    $nodes = Node::loadMultiple();
+    $this->assertCount(3, $nodes);
+    foreach ($nodes as $node) {
+      $this->assertEquals($original_value, $node->get($this->field->getName())->getString());
+    }
   }
 
   /**
