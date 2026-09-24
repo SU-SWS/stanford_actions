@@ -12,7 +12,6 @@ use Drupal\stanford_actions\Plugin\Action\CloneNode;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
-use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\Group;
 use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
@@ -20,7 +19,6 @@ use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
  * Class TestCloneNode.
  */
 #[Group('stanford_actions')]
-#[CoversClass(CloneNode::class)]
 #[RunTestsInSeparateProcesses]
 class CloneNodeTest extends KernelTestBase {
 
@@ -30,6 +28,27 @@ class CloneNodeTest extends KernelTestBase {
    * @var \Drupal\node\NodeInterface
    */
   protected $node;
+
+  /**
+   * Paragraph field name on the node.
+   *
+   * @var string
+   */
+  protected $paragraphField;
+
+  /**
+   * Layout paragraph on the original node.
+   *
+   * @var \Drupal\paragraphs\ParagraphInterface
+   */
+  protected $layout;
+
+  /**
+   * Paragraph whose parent layout is not on the node.
+   *
+   * @var \Drupal\paragraphs\ParagraphInterface
+   */
+  protected $orphan;
 
   /**
    * Modules to enable.
@@ -87,6 +106,7 @@ class CloneNodeTest extends KernelTestBase {
       'translatable' => TRUE,
     ]);
     $paragraph_field->save();
+    $this->paragraphField = $paragraph_field->getName();
     FieldConfig::create([
       'entity_type' => 'node',
       'bundle' => 'page',
@@ -115,6 +135,11 @@ class CloneNodeTest extends KernelTestBase {
     $text = Paragraph::create(['type' => 'text']);
     $text->setAllBehaviorSettings(['layout_paragraphs' => ['parent_uuid' => $layout->uuid()]]);
     $text->save();
+    $this->layout = $layout;
+
+    $this->orphan = Paragraph::create(['type' => 'text']);
+    $this->orphan->setAllBehaviorSettings(['layout_paragraphs' => ['parent_uuid' => 'missing-uuid']]);
+    $this->orphan->save();
 
     $this->node = Node::create([
       'title' => $this->randomMachineName(),
@@ -128,6 +153,10 @@ class CloneNodeTest extends KernelTestBase {
         [
           'target_id' => $text->id(),
           'target_revision_id' => $text->getRevisionId(),
+        ],
+        [
+          'target_id' => $this->orphan->id(),
+          'target_revision_id' => $this->orphan->getRevisionId(),
         ],
       ],
     ]);
@@ -174,6 +203,48 @@ class CloneNodeTest extends KernelTestBase {
       ->getStorage('node')
       ->loadByProperties(['title' => 'foo bar ' . $this->node->getTitle()]);
     $this->assertCount(1, $cloned);
+  }
+
+  /**
+   * Cloned layout paragraph children point to the cloned layout.
+   */
+  public function testLayoutParagraphParents() {
+    /** @var \Drupal\stanford_actions\Plugin\Action\CloneNode $action */
+    $action = $this->container->get('plugin.manager.action')
+      ->createInstance('node_clone_action');
+    $action->setConfiguration([
+      'clone_entities' => ['paragraph'],
+      'clone_count' => 1,
+      'prepend_title' => 'Copy',
+      'field_clone' => [],
+    ]);
+    $action->execute($this->node);
+
+    $cloned = \Drupal::entityTypeManager()
+      ->getStorage('node')
+      ->loadByProperties(['title' => 'Copy ' . $this->node->getTitle()]);
+    $this->assertCount(1, $cloned);
+    /** @var \Drupal\node\NodeInterface $cloned */
+    $cloned = reset($cloned);
+
+    $paragraph_storage = \Drupal::entityTypeManager()->getStorage('paragraph');
+    $paragraph_storage->resetCache();
+    $items = $cloned->get($this->paragraphField);
+    $this->assertCount(3, $items);
+
+    // Every paragraph was duplicated rather than reused.
+    $original_ids = array_column($this->node->get($this->paragraphField)->getValue(), 'target_id');
+    $cloned_ids = array_column($items->getValue(), 'target_id');
+    $this->assertEmpty(array_intersect($original_ids, $cloned_ids));
+
+    $cloned_layout = $paragraph_storage->load($cloned_ids[0]);
+    $cloned_text = $paragraph_storage->load($cloned_ids[1]);
+    $cloned_orphan = $paragraph_storage->load($cloned_ids[2]);
+
+    $this->assertNotEquals($this->layout->uuid(), $cloned_layout->uuid());
+    $this->assertEquals($cloned_layout->uuid(), $cloned_text->getAllBehaviorSettings()['layout_paragraphs']['parent_uuid']);
+    // A parent that isn't on the original node is left untouched.
+    $this->assertEquals('missing-uuid', $cloned_orphan->getAllBehaviorSettings()['layout_paragraphs']['parent_uuid']);
   }
 
   /**
