@@ -9,13 +9,16 @@ use Drupal\field\Entity\FieldConfig;
 use Drupal\field\Entity\FieldStorageConfig;
 use Drupal\node\Entity\Node;
 use Drupal\stanford_actions\Plugin\Action\FieldClone\SmartDate;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the date field clone plugin functions correctly.
- *
- * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\SmartDate
  */
+#[Group('stanford_actions')]
+#[CoversClass(SmartDate::class)]
+#[RunTestsInSeparateProcesses]
 class SmartDateTest extends FieldCloneTestBase {
 
   /**
@@ -35,7 +38,7 @@ class SmartDateTest extends FieldCloneTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setup(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->container->get('module_installer')->install(['stanford_actions']);
     $this->installConfig('smart_date');

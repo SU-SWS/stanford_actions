@@ -36,6 +36,13 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInterface, ContainerFactoryPluginInterface {
 
   /**
+   * Field clone plugin instances keyed by plugin id.
+   *
+   * @var \Drupal\stanford_actions\Plugin\Action\FieldClone\FieldCloneInterface[]
+   */
+  protected array $fieldClonePlugins = [];
+
+  /**
    * {@inheritdoc}
    */
   public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
@@ -110,7 +117,8 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
       '#default_value' => 'Clone',
     ];
 
-    foreach ($this->context['list'] as $item) {
+    $node_ids = [];
+    foreach ($this->context['list'] ?? [] as $item) {
       $node_ids[] = $item[0];
     }
 
@@ -190,7 +198,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
   /**
    * {@inheritdoc}
    */
-  public function access($object, AccountInterface $account = NULL, $return_as_object = FALSE) {
+  public function access($object, ?AccountInterface $account = NULL, $return_as_object = FALSE) {
     /** @var \Drupal\node\NodeInterface $object */
     $result = $object->access('update', $account, TRUE)
       ->andIf($object->access('create', $account, TRUE));

@@ -12,13 +12,16 @@ use Drupal\stanford_actions\Plugin\Action\CloneNode;
 use Drupal\KernelTests\KernelTestBase;
 use Drupal\node\Entity\Node;
 use Drupal\node\Entity\NodeType;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Class TestCloneNode.
- *
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\CloneNode
- * @group stanford_actions
  */
+#[Group('stanford_actions')]
+#[CoversClass(CloneNode::class)]
+#[RunTestsInSeparateProcesses]
 class CloneNodeTest extends KernelTestBase {
 
   /**
@@ -47,12 +50,11 @@ class CloneNodeTest extends KernelTestBase {
   /**
    * {@inheritdoc}
    */
-  public function setup(): void {
+  protected function setUp(): void {
     parent::setUp();
     $this->container->get('module_installer')->install(['stanford_actions']);
     $this->installEntitySchema('user');
     $this->installEntitySchema('node');
-    $this->installSchema('system', 'sequences');
     $this->installEntitySchema('field_config');
     $this->installEntitySchema('field_storage_config');
     $this->installEntitySchema('paragraph');
@@ -175,7 +177,7 @@ class CloneNodeTest extends KernelTestBase {
   }
 
   /**
-   * @covers ::access
+   * Test the access method.
    */
   public function testAccess() {
     /** @var \Drupal\Core\Action\ActionManager $action_manager */

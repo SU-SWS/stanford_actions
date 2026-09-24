@@ -5,13 +5,16 @@ namespace Drupal\Tests\stanford_actions\Kernel\Plugin\Action\FieldClone;
 use Drupal\Core\Form\FormState;
 use Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone;
 use Drupal\node\Entity\Node;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\Group;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
 
 /**
  * Test the date field clone plugin functions correctly.
- *
- * @group stanford_actions
- * @coversDefaultClass \Drupal\stanford_actions\Plugin\Action\FieldClone\DateClone
  */
+#[Group('stanford_actions')]
+#[CoversClass(DateClone::class)]
+#[RunTestsInSeparateProcesses]
 class DateTest extends FieldCloneTestBase {
 
   /**
