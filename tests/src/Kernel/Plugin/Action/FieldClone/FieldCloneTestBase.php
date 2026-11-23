@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Drupal\Tests\stanford_actions\Kernel\Plugin\Action\FieldClone;
 
 use Drupal\Core\Datetime\Entity\DateFormat;
@@ -109,8 +108,14 @@ abstract class FieldCloneTestBase extends KernelTestBase {
 
 }
 
+/**
+ * Minimal field clone plugin used to test the base class.
+ */
 class TestFieldCloneBase extends FieldCloneBase {
 
+  /**
+   * {@inheritdoc}
+   */
   public function alterFieldValue(FieldableEntityInterface $original_entity, FieldableEntityInterface $new_entity, $field_name, array $config = []) {
   }
 

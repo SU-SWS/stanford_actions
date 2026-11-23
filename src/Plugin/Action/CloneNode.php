@@ -81,7 +81,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $eventDispatcher
    *   Event dispatcher service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityFieldManagerInterface $entityFieldManager, protected EntityTypeManagerInterface $entityTypeManager, protected FieldCloneManagerInterface $fieldCloneManager, ConfigFactoryInterface $config_factory, protected AccountProxyInterface $currentUser, protected EventDispatcherInterface $eventDispatcher) {
+  final public function __construct(array $configuration, $plugin_id, $plugin_definition, protected EntityFieldManagerInterface $entityFieldManager, protected EntityTypeManagerInterface $entityTypeManager, protected FieldCloneManagerInterface $fieldCloneManager, ConfigFactoryInterface $config_factory, protected AccountProxyInterface $currentUser, protected EventDispatcherInterface $eventDispatcher) {
     $clone_entities = $config_factory->get('stanford_actions.settings')
       ->get('actions.node_clone_action.clone_entities');
     $configuration['clone_entities'] = $clone_entities ?? [];
@@ -238,6 +238,8 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
    *
    * @param \Drupal\node\NodeInterface $node
    *   New node entity.
+   * @param string|null $original_title
+   *   Title of the node being cloned.
    */
   protected function adjustNodeTitle(NodeInterface $node, $original_title) {
     if ($this->configuration['prepend_title'] ?? FALSE) {
@@ -346,7 +348,7 @@ class CloneNode extends ViewsBulkOperationsActionBase implements PluginFormInter
     // fields that are not base fields. Also we only want entity reference
     // fields that target specific entity types as defined above that require
     // cloning..
-    return array_filter($fields, function($field) use ($clone_target_types) {
+    return array_filter($fields, function ($field) use ($clone_target_types) {
       $target_entity_id = $field->getFieldStorageDefinition()
         ->getSetting('target_type');
       $types = ['entity_reference', 'entity_reference_revisions'];
