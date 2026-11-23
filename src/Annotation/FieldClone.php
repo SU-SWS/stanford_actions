@@ -13,6 +13,11 @@ use Drupal\Component\Annotation\Plugin;
  */
 class FieldClone extends Plugin {
 
+  /**
+   * Field types the plugin can alter when cloning.
+   *
+   * @var string[]
+   */
   protected $fieldTypes = [];
 
 }

@@ -9,7 +9,12 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Base field for all field clone plugins.
  *
+ * Subclasses must keep the PluginBase constructor signature because create()
+ * instantiates them with new static().
+ *
  * @package Drupal\stanford_actions\Plugin\Action\FieldClone
+ *
+ * @phpstan-consistent-constructor
  */
 abstract class FieldCloneBase extends PluginBase implements FieldCloneInterface {
 
